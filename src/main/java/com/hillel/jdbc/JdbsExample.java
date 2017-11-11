@@ -14,7 +14,8 @@ public class JdbsExample {
             System.out.println("Connection successful");
           // printStudents(connection);
             //addStudent(connection, "Богдан", "Кулебякин",36,"Рени");
-            transactionExample(connection);
+           // transactionExample(connection);
+            bathExample(connection);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -88,5 +89,29 @@ public class JdbsExample {
         }
         statement.close();
     }
+//bath - заполнение таблицы скопом
+    private static void bathExample(Connection connection) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(
+                "insert into students (firstname, lastname, age, grants, city)"+
+                     "values (?,?,?,?,?)");
+        connection.setAutoCommit(false);
 
+        for (int i = 0; i < 5; i++){
+            String firstname = "Нкто";
+            String lastname  = "Лукас";
+            int age = 30+i;
+            int grants = 30*i;
+            String city  = "Одесса";
+            preparedStatement.setString(1, firstname);
+            preparedStatement.setString(2,lastname);
+            preparedStatement.setInt(3,age);
+            preparedStatement.setInt(4,grants);
+            preparedStatement.setString(5,city);
+            preparedStatement.addBatch();//отправ в буфер, чтобы потом все скопом записать
+        }
+
+        preparedStatement.executeBatch();//записываем батч
+        connection.setAutoCommit(true);
+        preparedStatement.close();
+    }
 }
