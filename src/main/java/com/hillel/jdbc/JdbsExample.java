@@ -4,21 +4,27 @@ import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 
 import javax.sql.PooledConnection;
 import java.sql.*;
+import java.util.Properties;
 
 public class JdbsExample {
 
     public static void main(String[] args) throws InterruptedException {
         try {
+
+            //
+            Properties properties = DatabasesProperties.load();
             //Class.forName("com.msql.jdbc.Driver");
 //            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/school?serverTimezone = UTC&useSSL = false",
 //                    "root",
 //                    "root");
 
+
+
             //Создание пула коннекшенов
             MysqlConnectionPoolDataSource mysqlConnectionPoolDataSource = new MysqlConnectionPoolDataSource();
-            mysqlConnectionPoolDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/school?serverTimezone = UTC&useSSL = false");
-            mysqlConnectionPoolDataSource.setUser("root");
-            mysqlConnectionPoolDataSource.setPassword("root");
+            mysqlConnectionPoolDataSource.setUrl(properties.getProperty("url"));
+            mysqlConnectionPoolDataSource.setUser(properties.getProperty("user"));
+            mysqlConnectionPoolDataSource.setPassword(properties.getProperty("password"));
 
             PooledConnection pooledConnection = mysqlConnectionPoolDataSource.getPooledConnection();
             Connection connection = pooledConnection.getConnection();
