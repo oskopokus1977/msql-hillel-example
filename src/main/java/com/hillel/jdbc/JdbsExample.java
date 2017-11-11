@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class JdbsExample {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         try {
             //Class.forName("com.msql.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/school?serverTimezone = UTC&useSSL = false",
@@ -12,8 +12,9 @@ public class JdbsExample {
                     "root");
 
             System.out.println("Connection successful");
-           printStudents(connection);
+          // printStudents(connection);
             //addStudent(connection, "Богдан", "Кулебякин",36,"Рени");
+            transactionExample(connection);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,4 +56,37 @@ public class JdbsExample {
 
         preparedStatement.close();
     }
+
+    //транзакции
+    private static void transactionExample(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        connection.setAutoCommit(false);//откл автокомит, чтобы не нарушать целостность транзакции
+
+        try {
+
+        statement.executeUpdate("insert into students(firstname, lastname, age, grants, city)" +
+                "values ('Педро','Потрашенко', 50, 113, 'Киев')");
+
+        System.out.println("After first insert");
+
+        statement.executeUpdate("insert into students(firstname, lastname, age, city)" +
+                "values ('Луи','Армстронг', 90, 'Измаил')");
+
+        System.out.println("After second insert");
+
+        connection.commit();
+            System.out.println("All data saved");
+        }
+        catch (Exception e){
+            connection.rollback();
+
+            System.out.println("After rollback");
+            e.printStackTrace();
+        }
+        finally {
+            connection.setAutoCommit(true);//включаем автокомит обратно
+        }
+        statement.close();
+    }
+
 }
