@@ -15,7 +15,8 @@ public class JdbsExample {
           // printStudents(connection);
             //addStudent(connection, "Богдан", "Кулебякин",36,"Рени");
            // transactionExample(connection);
-            bathExample(connection);
+           // bathExample(connection);
+            storedProcedureExample(connection);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -113,5 +114,20 @@ public class JdbsExample {
         preparedStatement.executeBatch();//записываем батч
         connection.setAutoCommit(true);
         preparedStatement.close();
+    }
+
+    //выполнение хранимой процедуры
+    private static void storedProcedureExample(Connection connection) throws SQLException {
+        //объект для вызова хранимой процедуры
+        CallableStatement callableStatement = connection.prepareCall("{call addNewTeacher(?,?,?)}");
+        callableStatement.setString(1, "Петренко Игорь");
+        callableStatement.setInt(2, 35);
+        callableStatement.registerOutParameter(3, Types.INTEGER);//выходной параметр порядковый номер "?", и тип выходного параметра
+        callableStatement.execute();
+        int teacherID = callableStatement.getInt(3);//записывает параметра 3
+        System.out.println("A new teacher has " + teacherID);
+
+        callableStatement.close();
+
     }
 }
