@@ -1,5 +1,8 @@
 package com.hillel.jdbc;
 
+import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
+
+import javax.sql.PooledConnection;
 import java.sql.*;
 
 public class JdbsExample {
@@ -7,16 +10,24 @@ public class JdbsExample {
     public static void main(String[] args) throws InterruptedException {
         try {
             //Class.forName("com.msql.jdbc.Driver");
-            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/school?serverTimezone = UTC&useSSL = false",
-                    "root",
-                    "root");
+//            Connection connection = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/school?serverTimezone = UTC&useSSL = false",
+//                    "root",
+//                    "root");
 
+            //Создание пула коннекшенов
+            MysqlConnectionPoolDataSource mysqlConnectionPoolDataSource = new MysqlConnectionPoolDataSource();
+            mysqlConnectionPoolDataSource.setUrl("jdbc:mysql://127.0.0.1:3306/school?serverTimezone = UTC&useSSL = false");
+            mysqlConnectionPoolDataSource.setUser("root");
+            mysqlConnectionPoolDataSource.setPassword("root");
+
+            PooledConnection pooledConnection = mysqlConnectionPoolDataSource.getPooledConnection();
+            Connection connection = pooledConnection.getConnection();
             System.out.println("Connection successful");
-          // printStudents(connection);
+           printStudents(connection);
             //addStudent(connection, "Богдан", "Кулебякин",36,"Рени");
            // transactionExample(connection);
            // bathExample(connection);
-            storedProcedureExample(connection);
+            //storedProcedureExample(connection);
 
         } catch (SQLException e) {
             e.printStackTrace();
